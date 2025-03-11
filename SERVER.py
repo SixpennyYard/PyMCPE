@@ -2,8 +2,9 @@ from pieraknet.server import Server as RakNetServer
 
 class BedrockServer:
     def main(self):
-        from bedrock_protocol import BedrockProtocol
+        from bedrock_protocol.protocol.protocol import BedrockProtocol
 
+        print(0x80 <= 0x01)
         server = RakNetServer(logginglevel="INFO")
         protocol = BedrockProtocol(server)
         server.interface = protocol
