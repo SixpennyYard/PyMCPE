@@ -1,3 +1,5 @@
 /LICENSE
 /pyproject.toml
 /README.md
+/.venv
+/.vscode
