@@ -1,6 +1,7 @@
 import json
 import jwt
 import requests
+import os
 from jwt.algorithms import RSAAlgorithm
 
 
