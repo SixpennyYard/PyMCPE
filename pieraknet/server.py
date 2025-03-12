@@ -143,8 +143,6 @@ class Server:
         elif packet_id == ProtocolInfo.OPEN_CONNECTION_REQUEST_2:
             packet = OpenConnectionRequest2(data)
             OpenConnectionRequest2Handler.handle(packet, self, client)
-        elif packet_id == ProtocolInfo.LOGIN:
-            self.handle_login_packet(data, client)
         elif ProtocolInfo.FRAME_SET_0 <= packet_id <= ProtocolInfo.FRAME_SET_F:
             try:
                 connection = self.get_connection(client)
