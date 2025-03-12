@@ -25,12 +25,14 @@ class BedrockProtocol:
 
         packet_id = packet_body[0]
 
+        if packet_id not in vars(BedrockProtocolInfo).values():
+            self.server.logger.warning(f"Received unknown packet ID: {packet_id} from {connection.address}")
+
+
         if packet_id == BedrockProtocolInfo.LOGIN:
             self.handle_login(packet_body, connection)
         elif packet_id == BedrockProtocolInfo.DISCONNECT:
             self.handle_disconnect(connection)
-        else:
-            self.server.logger.info(f"Unhandled packet: {packet_id} from {connection.address}")
 
 
     def handle_login(self, data, connection):
@@ -52,7 +54,8 @@ class BedrockProtocol:
             username = client_data.get("DisplayName", "Unknown")
             uuid = client_data.get("ClientRandomId", "Unknown")
             xbox_token = client_data.get("XUID", None)
-
+            self.server.logger.info(f"Client version: {client_data.get('GameVersion', 'Unknown')}")
+            
             if not xbox_token:
                 self.server.logger.warning(f"Login failed: No Xbox Live token from {connection.address}")
                 self.send_play_status(connection, BedrockProtocolInfo.PLAY_STATUS_FAILED_CLIENT)
