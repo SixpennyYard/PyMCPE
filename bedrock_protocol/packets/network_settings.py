@@ -1,33 +1,25 @@
 import struct
-
 from bedrock_protocol.protocol.bedrock_protocol_info import BedrockProtocolInfo
 
 class NetworkSettings:
     def __init__(self, server):
         self.server = server
 
+        self.compression_threshold = 256
+        self.compression_algorithm = 1
+        self.enable_client_throttling = True
+        self.client_throttle_threshold = 10
+        self.client_throttle_scalar = 1.0
+
     def handle_request(self, connection):
         self.server.logger.info(f"Received Request Network Settings from {connection.address}")
 
-        flags = struct.pack("<I", 0) 
+        packet = struct.pack("<B", BedrockProtocolInfo.NETWORK_SETTINGS)
+        packet += struct.pack("<H", self.compression_threshold)
+        packet += struct.pack("<H", self.compression_algorithm)
+        packet += struct.pack("<?", self.enable_client_throttling)
+        packet += struct.pack("<B", self.client_throttle_threshold)
+        packet += struct.pack("<f", self.client_throttle_scalar)
 
-        options = [
-            1,
-            2, 
-            3  
-        ]
-
-        encoded_options = b"".join(self.encode_varint(option) for option in options)
-
-        response_packet = bytes([BedrockProtocolInfo.NETWORK_SETTINGS]) + flags + self.encode_varint(len(options)) + encoded_options
-
-        self.server.send(response_packet, connection.address)
+        self.server.send(packet, connection.address)
         self.server.logger.info(f"Sent Network Settings to {connection.address}")
-
-    def encode_varint(self, value):
-        encoded = b""
-        while value >= 0x80:
-            encoded += bytes([(value & 0x7F) | 0x80])
-            value >>= 7
-        encoded += bytes([value])
-        return encoded

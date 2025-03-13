@@ -4,7 +4,6 @@ from bedrock_protocol.packets.network_settings import NetworkSettings
 from bedrock_protocol.packets.start_game import StartGame
 from bedrock_protocol.manager.login_manager import LoginManager
 from bedrock_protocol.manager.player_manager import PlayerManager
-import time
 
 class BedrockProtocol:
     def __init__(self, server):

@@ -1,4 +1,7 @@
 class BedrockProtocolInfo:
+
+    PROTOCOL = 776
+
     LOGIN = 0x01
     PLAY_STATUS = 0x02
     SERVER_TO_CLIENT_HANDSHAKE = 0x03

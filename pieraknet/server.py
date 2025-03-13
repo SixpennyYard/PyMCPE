@@ -35,13 +35,9 @@ class Server:
                  game_mode_number=1, 
                  portv6=19133
                  ):
+        self.loggingLevel = logginglevel
         if logger is None:
-            logger = logging.getLogger("PieRakNet")
-            logger.setLevel(getattr(logging, logginglevel.upper()))
-            formatter = logging.Formatter('%(asctime)s [%(name)s - %(levelname)s] - %(message)s', "%H:%M:%S")
-            handler = logging.StreamHandler()
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
+            logger = self.setup_logging()
         self.logger = logger
         self.hostname = hostname
         self.port = port
@@ -76,6 +72,29 @@ class Server:
         self.maxsize = 4096
         self.response_data = self.update_response_data()
         self.logger.info('Server initialized.')
+
+    def setup_logging(self):
+        logger = logging.getLogger("BedrockServer")
+        logger.setLevel(logging.DEBUG) 
+
+        formatter = logging.Formatter('%(asctime)s [%(name)s - %(levelname)s] - %(message)s', "%Y-%m-%d %H:%M:%S")
+
+        file_handler = logging.FileHandler("log.txt", mode="a", encoding="utf-8")
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(logging.DEBUG)  
+
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        console_handler.setLevel(getattr(logging, self.loggingLevel.upper()))  
+
+        logger.addHandler(file_handler)
+        logger.addHandler(console_handler)
+
+        logger.debug("")
+        logger.debug("")
+        logger.debug("")
+
+        return logger
 
     def send(self, data, address: tuple):
         if not isinstance(data, bytes):
