@@ -1,33 +1,28 @@
-import struct
 import binascii
 from bedrock_protocol.protocol.bedrock_protocol_info import BedrockProtocolInfo
+from bedrock_protocol.packets.bedrock_packet import BedrockPacket
 
-class NetworkSettings:
+class NetworkSettings(BedrockPacket):
     def __init__(self, server):
+        super().__init__()
         self.server = server
 
         self.compression_threshold = 1
         self.compression_algorithm = 0
         self.enable_client_throttling = False
         self.client_throttle_threshold = 0
-        self.client_throttle_scalar = 0
+        self.client_throttle_scalar = 0.0
 
-    def handle_request(self, connection):
-        self.server.logger.info(f"📡 Received Request Network Settings from {connection.address}")
-    
-        packet = struct.pack("<B", BedrockProtocolInfo.NETWORK_SETTINGS)
-        packet += struct.pack("<H", self.compression_threshold)
-        packet += struct.pack("<H", self.compression_algorithm)
-        packet += struct.pack("<?", self.enable_client_throttling)
-        packet += struct.pack("<B", self.client_throttle_threshold)
-        packet += struct.pack(">f", self.client_throttle_scalar)
+    def create_packet(self):
+        """Crée un paquet NetworkSettings encodé."""
+        self.reset()
+        self.write_byte(BedrockProtocolInfo.NETWORK_SETTINGS)
+        self.write_short(self.compression_threshold)
+        self.write_short(self.compression_algorithm)
+        self.write_bool(self.enable_client_throttling)
+        self.write_byte(self.client_throttle_threshold)
+        self.write_float(self.client_throttle_scalar)
 
-        self.server.logger.debug(f"compressionThreshold: {self.compression_threshold}")
-        self.server.logger.debug(f"compressionAlgorithm: {self.compression_algorithm}")
-        self.server.logger.debug(f"enableClientThrottling: {self.enable_client_throttling}")
-        self.server.logger.debug(f"clientThrottleThreshold: {self.client_throttle_threshold}")
-        self.server.logger.debug(f"clientThrottleScalar: {self.client_throttle_scalar}")
-        self.server.logger.debug(f"📦 Network Settings Raw Data (Final+Fix): {binascii.hexlify(packet).decode()}")
-    
-        self.server.send(packet, connection.address)
-        self.server.logger.info(f"✅ Sent Network Settings to {connection.address}")
+        raw_data = self.get_value()
+        self.server.logger.debug(f"📦 Network Settings Raw Data (Final+Fix): {binascii.hexlify(raw_data).decode()}")
+        return raw_data
